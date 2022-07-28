@@ -2,15 +2,16 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config(); //El paquete dotenv permite leer las variables de entorno del fichero .env
 
-console.log(process.env);
-
 //Crear el servidor/aplicación de express
 const app = express();
 
-// CORS (middleware)
+// Directorio público
+app.use( express.static('public') )
+
+// CORS (el use es el middleware)
 app.use( cors() );
 
-// Lectura y parseo del body (middleware)
+// Lectura y parseo del body (el use es el middleware)
 app.use( express.json() );
 
 // Rutas
