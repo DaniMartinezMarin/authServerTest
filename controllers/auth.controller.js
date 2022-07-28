@@ -1,5 +1,5 @@
 const { response } = require('express')
-const { request } = require('express')
+const { request } = require('express');
 
 const crearUsuario = ( req = request, res = response ) => {
 
