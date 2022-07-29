@@ -2,7 +2,7 @@ version: "3"
 
 services:
     web:
-        container_name: exampleapp
+        container_name: authapp
         restart: always
         build: .
         ports:
@@ -18,3 +18,5 @@ services:
             - "27017:27017"
         logging:
             driver: none
+        volumes:
+            - ./mongo_data:/data/db
