@@ -19,7 +19,7 @@ const crearUsuario = async( req = request, res = response ) => {
             })
         }
 
-        //Crear usuario con el modelo
+        // Crear usuario con el modelo
         const dbUser = new Usuario( req.body )
 
         // Hash de la contrasña
@@ -29,7 +29,7 @@ const crearUsuario = async( req = request, res = response ) => {
         // Generar el JWT
         const token = await generarJWT( dbUser.id, nombre );
 
-        //Crear usuario de BD
+        // Crear usuario de BD
         await dbUser.save();
 
         // Generar respuesta exitosa
@@ -49,15 +49,50 @@ const crearUsuario = async( req = request, res = response ) => {
 
 }
 
-const loginUsuario = ( req = request, res = response ) => {
+const loginUsuario = async( req = request, res = response ) => {
 
     const { email, password } = req.body;
-    console.log(email, password);
 
-    return res.json({
-        ok:true,
-        msg: 'Login de usuario /'
-    });
+    try{
+
+        const dbUser = await Usuario.findOne({ email });
+
+        if( !dbUser ) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'El correo no existe'
+            })
+        }
+
+        //Comprobar si el password hace match
+        const validPassword = bcrypt.compareSync( password, dbUser.password );
+
+        if( !validPassword ) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'El password no es válido'
+            })
+        }
+
+        //Generar el JWT
+        const token = await generarJWT( dbUser.id, dbUser.nombre );
+
+        //Respuesta del servicio
+        return res.json({
+            ok: true,
+            uid: dbUser.id,
+            name: dbUser.nombre,
+            token
+        })
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            ok: false,
+            msg: 'Se ha producido un error al hacer login, por favor contacte con el administrador'
+        })
+    }
 }
 
 const renewToken = ( req = request, res = response ) => {
